@@ -201,7 +201,7 @@ function mouseDragged() { //would it be worth it to use dist()?
   if ((mouseX >= bugX - bugW && mouseX <= bugX + bugW) &&
     (mouseY >= bugY - bugL && mouseY <= bugY + bugL)) {
     //bugY = map(mouseY, height, 0, 200, 0);
-    bugY = mouseY;
+    bugY = constrain(mouseY, 0, height);
     /*if (bugY > height ){
     bugY = height - 30;
     }
@@ -218,7 +218,7 @@ function mouseDragged() { //would it be worth it to use dist()?
     //petals.this.x = mouseX; how to make this work?
   } else if ((mouseX >= birdX - birdW && mouseX <= birdX + birdW) &&
     (mouseY >= birdY - birdL && mouseY <= birdY + birdL)) {
-    birdX = mouseX;
+    birdX = constrain(mouseX, 0, width);
     for (let petal of petals) {
       petal.move();
     }
