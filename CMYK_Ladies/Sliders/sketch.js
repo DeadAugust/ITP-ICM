@@ -1,7 +1,7 @@
 // CMYK Halftone Portrait Morph
 // by August Luhrs Oct. 2018
 // photos by Arne Svenson
-// with lots of help from Dan Shiffman
+// with lots of help from Dan Shiffman, Alejandro Matamala Ortiz, Allison Parrish
 // built off template from webcam sketch from CCFestLA '17
 // RGB --> CMYK formula derived after much head-ache from: 
 // http://www.easyrgb.com/en/math.php and
