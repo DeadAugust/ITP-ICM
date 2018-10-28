@@ -1,5 +1,5 @@
 let api = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?';
-let apiKey = 'api-key=0e4d093fd10a4509b447d8aa5a39b161';
+let apiKey = 'api-key= YOUR KEY'; // insert your own key
 let fqDesk = '&fq=news_desk:(%22Obits%22%20%22Obituaries%22%20%22Obituary%22)';
 let fqPersons= '%20AND%20persons.contains:(\"'
 let fqEnd = '\")';
