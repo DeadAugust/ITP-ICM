@@ -1,12 +1,16 @@
-// d20 simulator by August Luhrs
-// using p5.js web editor (url w/ code below)
-// https://editor.p5js.org/DeadAugust/sketches/SyJVKR8dm
+//d20 simulator by August Luhrs
 // 9/12/18 for ITP ICM class
 
 var d;
 
 function setup() {
-  createCanvas(600, 600);
+  if (windowWidth > windowHeight) {
+    createCanvas(windowHeight, windowHeight);
+  }
+  else {
+    createCanvas(windowWidth, windowWidth);
+  }
+  //createCanvas(400, 400);
   d = 0;
 }
 
@@ -135,8 +139,13 @@ function draw() {
   }
 }
 
-function mouseReleased() {
+/*function mouseReleased() {
   //d = 20;
+  d = floor(random() * 20 + 1);
+}
+*/
+
+function mousePressed() {
   d = floor(random() * 20 + 1);
 }
 
