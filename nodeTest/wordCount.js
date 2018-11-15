@@ -4,5 +4,5 @@ var fs = require('fs');
 // utf8 encoding
 var text = fs.readFileSync("genesis.txt", "utf8");
 
-var words = text.split(" ");
+var words = text.split(" "); //test
 console.log(words.length);

@@ -2,7 +2,7 @@ var greetings = ["hello", "greetings", "hey there", "hi", "howdy"];
 var places = ["city", "country", "world", "solar system", "galaxy"];
 
 function choice(t) {
-    return t[Math.floor(Math.random()*t.length)];
+    return t[Math.floor(Math.random()*t.length)]; //test
 }
 
 for (var i = 0; i < 10; i++) {
