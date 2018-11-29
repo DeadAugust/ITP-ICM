@@ -6,7 +6,11 @@ var socket;
 
 var atman;
 var atmans = [];
-var fud = ['tato', 'mork', 'upple'];
+var fud = ['tato', 'mork', 'upple']; //starting item
+var pockets = []; //inventory
+var fud1;
+var target; //bool for if player selected
+var trade; //bool for if trade is possible
 
 function setup() {
   /*
@@ -22,7 +26,7 @@ function setup() {
   socket = io.connect('http://localhost:3000');
   //socket.on('mouse', newDrawing);
 
-  atman = new Atman (random(width), random(height-100), random(fud),
+  atman = new Atman (random(50, width - 50), random(50, height-150), random(fud),
     random(50,255), random(50,255), random(50,255));
 
   var data = {
@@ -41,10 +45,21 @@ function setup() {
       atmans = data;
     }
   );
+
+  socket.on('get', getFud); //for receiving trades
+
+  //inventory
+  fill(100);
+  rect(0,height-100,width,height/4);
+  fud1 = new Button(width/2, 7 * height/8, atman.fud);
+  pockets.push(fud1);
+  for (var i = pockets.length - 1; i >= 0; i--){
+    pockets[i].show();
+  }
 }
 
 function draw() {
-  console.log(socket.id + " " + atman.fud);
+  //console.log(socket.id + " " + atman.fud);
   for (var i = atmans.length - 1; i >=0; i --){
     var id = atmans[i].id;
     if (id.substring(2, id.length) !== socket.id){
@@ -58,6 +73,12 @@ function draw() {
     }
   }
   atman.show();
+  textSize(18);
+  fill(0);
+  text('me', atman.x - 2, atman.y + 5);
+  for (var i = pockets.length - 1; i >= 0; i--){
+    pockets[i].show();
+  }
 
   var data = {
     x: atman.x,
@@ -70,7 +91,95 @@ function draw() {
   socket.emit('update', data);
 }
 
+function mousePressed(){
+  console.log(pockets);
+  if((mouseX >= atman.x - 40) && (mouseX <= atman.x + 40)
+    && (mouseY >= atman.y - 40) && (mouseY <= atman.y + 40)){
+      clearTrade();
+    }
+  for (var i = atmans.length - 1; i >=0; i--){ //select player for trade
+    if((mouseX >= atmans[i].x - 30) && (mouseX <= atmans[i].x + 30)
+      && (mouseY >= atmans[i].y - 30) && (mouseY <= atmans[i].y + 30)){
+        clearTrade();
+        atmans[i].s = true;
+        fill(125);
+        ellipse(atmans[i].x, atmans[i].y, 40, 40);
+        target = true;
+    }
+  }
+  for (var i = pockets.length - 1; i >=0; i--){ //select item in inventory
+    if((mouseX >= pockets[i].x) && (mouseX <= pockets[i].x + pockets[i].w)
+      && (mouseY >= pockets[i].y) && (mouseY <= pockets[i].y + pockets[i].h)){
+        if (pockets[i].t == 'give?' && target){ //changed trade to give
+          console.log('trade');
 
+          for (var j = pockets.length - 1; j >=0; j--){
+            if (pockets[j].f == 125){
+              for (var k = atmans.length - 1; k >=0; k--){
+                if (atmans[k].s == true){ //this whole section is probs dumb
+                  console.log(atmans[k].id);
+                  var data = {
+                  id: atmans[k].id,
+                  fud: pockets[j].t
+                  }
+                }
+              }
+
+              pockets[j].t = 'empty';
+              socket.emit('get', data);
+            }
+          }
+          clearTrade();
+        }
+        else if(pockets[i].f == 255){
+          pockets[i].f = 125;
+          pockets[i].show();
+          if(pockets[i].tog == 0){
+            trade = true;
+            var tradesies = new Button(4 * width/5, 7 * height/8, 'give?');
+            pockets.push(tradesies);
+            for (var j = pockets.length - 1; j >= 0; j--){
+              pockets[i].show();
+            }
+            pockets[i].tog = 1;
+          }
+        }
+        else{
+          clearTrade();
+          pockets[i].f = 255;
+          pockets[i].show();
+        }
+    }
+  }
+}
+
+function clearTrade(){
+  background(0, 150, 50);
+  fill(100);
+  rect(0,height-100,width,height/4);
+  target = false;
+  if (trade){
+    trade = false;
+    pockets.pop();
+  }
+  for (var i = atmans.length - 1; i >= 0; i--){
+    atmans[i].s = false;
+  }
+  for (var i = pockets.length - 1; i >= 0; i--){
+    pockets[i].f = 255;
+    pockets[i].tog = 0;
+  }
+}
+
+function getFud(data){
+  clearTrade();
+  var newFud = new Button(1 * width/5, 7 * height/8, data.fud);
+  pockets.push(newFud);
+  for (var j = pockets.length - 1; j >= 0; j--){
+    pockets[i].show();
+  }
+
+}
 function Atman(x, y, fud, r, g, b){
   this.x = x;
   this.y = y;
@@ -78,6 +187,7 @@ function Atman(x, y, fud, r, g, b){
   this.r = r;
   this.g = g;
   this.b = b;
+  this.s = false; //if selected
 
   this.show = function(){
     fill(this.r, this.g, this.b);
@@ -86,6 +196,24 @@ function Atman(x, y, fud, r, g, b){
 
   //this.inventory
   //this.trade
+}
+
+function Button(x, y, t){
+  this.x = x;
+  this.y = y;
+  this.w = 100;
+  this.h = 30;
+  this.t = t;
+  this.f = 255;
+  this.tog = 0; //to prevent multiple button presses
+
+  this.show = function(){
+    fill(this.f);
+    rect(this.x, this.y, this.w, this.h);
+    fill(0);
+    textSize(16);
+    text(this.t,this.x + 30,this.y + 20);
+  }
 }
 /*
 function newDrawing(data){

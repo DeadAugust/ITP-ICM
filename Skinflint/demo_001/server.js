@@ -63,9 +63,23 @@ io.sockets.on('connection',
       }
     );
 
+    socket.on('get',
+      function(data){
+        socket.broadcast.to(data.id).emit('get', data);
+        // io.to(`${data.id}`).emit('get',data);
+        console.log(data);
+      }
+    );
+
     socket.on('disconnect',
-      function(){
+      function(data){ //how to remove old players???
+        // for (var i = atmans.length -1; i >= 0; i--){
+        //   if(socket.id == atmans[i].id){
+        //     atmans = atmans.slice(atmans[i]);
+        //   }
+        // }
         console.log("Client has disconnected");
+        console.log(atmans);
       }
     );
   }
