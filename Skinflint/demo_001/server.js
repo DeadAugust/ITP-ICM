@@ -54,6 +54,7 @@ io.sockets.on('connection',
             atman = atmans[i];
           }
         }
+        // atman.id = socket.id; //why
         atman.x = data.x;
         atman.y = data.y;
         atman.fud = data.fud;
@@ -65,7 +66,9 @@ io.sockets.on('connection',
 
     socket.on('get',
       function(data){
-        socket.broadcast.to(data.id).emit('get', data);
+        socket.broadcast.emit('get', data);
+        // io.sockets.emit('get', data);
+        // socket.broadcast.to(data.id).emit('get', data);
         // io.to(`${data.id}`).emit('get',data);
         console.log(data);
       }

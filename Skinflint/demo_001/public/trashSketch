@@ -9,8 +9,8 @@ var atmans = [];
 var fud = ['tato', 'mork', 'upple']; //starting item
 var pockets = []; //inventory
 var fud1;
-var target; //bool for if player selected
-var trade; //bool for if trade is possible
+var target = false; //bool for if player selected
+var trade = false; //bool for if trade is possible
 
 function setup() {
   /*
@@ -81,6 +81,7 @@ function draw() {
   }
 
   var data = {
+    // id: socket.id,
     x: atman.x,
     y: atman.y,
     fud: atman.fud,
@@ -115,15 +116,16 @@ function mousePressed(){
 
           for (var j = pockets.length - 1; j >=0; j--){
             if (pockets[j].f == 125){
+              console.log(pockets[j].f);
               // for (var k = atmans.length - 1; k >=0; k--){
-                // if (atmans[k].s == true){ //this whole section is probs dumb
-                  // console.log(atmans[k].id);
+              //   if (atmans[k].s == true){ //this whole section is probs dumb
+              //     console.log(atmans[k].id);
                   var data = {
                   // id: atmans[k].id,
                   fud: pockets[j].t
-                  }
+                //   }
                 // }
-              // }
+              }
 
               pockets[j].t = 'empty';
               socket.emit('get', data);
@@ -176,11 +178,12 @@ function getFud(data){
   var newFud = new Button(1 * width/5, 7 * height/8, data.fud);
   pockets.push(newFud);
   for (var j = pockets.length - 1; j >= 0; j--){
-    pockets[j].show();
+    pockets[i].show();
   }
 
 }
-function Atman(x, y, fud, r, g, b){
+function Atman(id, x, y, fud, r, g, b){
+  // this.id = id;
   this.x = x;
   this.y = y;
   this.fud = fud;
@@ -223,11 +226,13 @@ function newDrawing(data){
 }
 function mouseDragged(){
   console.log('sending: ' + mouseX + mouseY);
+
   var data = {
     x: mouseX,
     y: mouseY
   }
   socket.emit('mouse', data);
+
   noStroke();
   fill(255);
   ellipse(mouseX,mouseY,20,20);
