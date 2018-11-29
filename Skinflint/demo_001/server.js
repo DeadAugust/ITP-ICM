@@ -1,11 +1,14 @@
 
 var atmans = [];
 
-function Atman(id, x, y, fud){
+function Atman(id, x, y, fud, r, g, b){
   this.id = id;
   this.x = x;
   this.y = y;
   this.fud = fud;
+  this.r = r;
+  this.g = g;
+  this.b = b;
 }
 
 var express = require('express');
@@ -20,7 +23,7 @@ function listen() {
 
 app.use(express.static('public'));
 
-//console.log('My socket server is running');
+console.log('My socket server is running');
 // var socket = require('socket.io');
 // var io = socket(server);
 
@@ -37,7 +40,7 @@ io.sockets.on('connection',
     console.log("We have a new client: " + socket.id);
     socket.on('start',
       function(data){
-        console.log(socket.id + " " + socket.fud);
+        console.log(socket.id + " " + data.fud);
         var atman = new Atman(socket.id, data.x, data.y, data.fud);
         atmans.push(atman);
       }
@@ -52,8 +55,11 @@ io.sockets.on('connection',
           }
         }
         atman.x = data.x;
-        atman.y = data.y
+        atman.y = data.y;
         atman.fud = data.fud;
+        atman.r = data.r;
+        atman.g = data.g;
+        atman.b = data.b;
       }
     );
 

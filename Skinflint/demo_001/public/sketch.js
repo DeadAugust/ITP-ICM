@@ -18,16 +18,20 @@ function setup() {
   }
   */
   createCanvas(400,400);
-  background(0, 200, 50);
+  background(0, 150, 50);
   socket = io.connect('http://localhost:3000');
   //socket.on('mouse', newDrawing);
 
-  atman = new Atman (random(width), random(height), random(fud));
+  atman = new Atman (random(width), random(height-100), random(fud),
+    random(50,255), random(50,255), random(50,255));
 
   var data = {
     x: atman.x,
     y: atman.y,
-    fud: atman.fud;
+    fud: atman.fud,
+    r: atman.r,
+    g: atman.g,
+    b: atman.b
   };
   socket.emit('start', data);
 
@@ -40,10 +44,11 @@ function setup() {
 }
 
 function draw() {
+  console.log(socket.id + " " + atman.fud);
   for (var i = atmans.length - 1; i >=0; i --){
     var id = atmans[i].id;
-    if (id.substring(2 id.length) !== socket.id){
-      fill(random(255));
+    if (id.substring(2, id.length) !== socket.id){
+      fill(atmans[i].r, atmans[i].g, atmans[i].b);
       ellipse(atmans[i].x, atmans[i].y, 30, 30);
 
       fill(255);
@@ -57,9 +62,30 @@ function draw() {
   var data = {
     x: atman.x,
     y: atman.y,
-    fud: atman.fud;
+    fud: atman.fud,
+    r: atman.r,
+    g: atman.g,
+    b: atman.b
   };
   socket.emit('update', data);
+}
+
+
+function Atman(x, y, fud, r, g, b){
+  this.x = x;
+  this.y = y;
+  this.fud = fud;
+  this.r = r;
+  this.g = g;
+  this.b = b;
+
+  this.show = function(){
+    fill(this.r, this.g, this.b);
+    ellipse(this.x, this.y, 40, 40);
+  }
+
+  //this.inventory
+  //this.trade
 }
 /*
 function newDrawing(data){

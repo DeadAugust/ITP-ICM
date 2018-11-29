@@ -1,3 +1,5 @@
+//useless for now, idk why
+
 function Atman(x, y, fud){
   this.x = x;
   this.y = y;
