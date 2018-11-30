@@ -1,5 +1,8 @@
+//object with
+//two classes w/ relationship
+//chat room examples
 
-var atmans = [];
+ var atmans = [];
 
 function Atman(id, x, y, fud, r, g, b){
   this.id = id;
@@ -51,7 +54,7 @@ io.sockets.on('connection',
     socket.on('update',
       function(data) {
         var atman;
-        for (var i = 0; i < atmans.length; i++){
+        for (var i = 0; i < atmans.length; i++){ //why forward diff?
           if (socket.id == atmans[i].id){
             atman = atmans[i];
           }
