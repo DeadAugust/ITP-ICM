@@ -52,7 +52,8 @@ io.sockets.on('connection',
 
     socket.on('msg',
       function(data){
-        socket.broadcast.to(data.id).emit('msg', data);
+        socket.broadcast.to(data.idTo).emit('msg', data);
+        console.log(data);
       }
     );
 

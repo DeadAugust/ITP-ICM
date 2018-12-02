@@ -37,7 +37,7 @@ function draw() {
 			fill(0);
 			textAlign(CENTER);
 			textSize(18);
-			text(peeps[i].id);
+			text(peeps[i].id, peeps[i].x, peeps[i].y);
 		}
 	}
 	peep.show(); //LOL
@@ -46,12 +46,17 @@ function draw() {
 	text('me', peep.x - 2, peep.y + 5);
 
 	var data = {
-		// id?
+		// id? not needed
 		x: peep.x,
 		y: peep.y
 		// s?
 	};
 	socket.emit('update', data);
+	socket.on('msg',
+		function (data){
+			console.log('msg from: ' + data.idFrom);
+		}
+	);
 }
 
 function mousePressed(){
@@ -70,6 +75,11 @@ function mousePressed(){
 				ellipse(peeps[i].x, peeps[i].y, 40, 40);
 				//target = true;
 				console.log(peeps[i].id);
+				var data = {
+					idTo: peeps[i].id,
+					idFrom: socket.id
+				}
+				socket.emit('msg', data);
 		}
 	}
 }
