@@ -12,8 +12,10 @@ function setup() {
 }
 
 function draw() {
+	console.log('test');
 	for (var i = peeps.length - 1; i >= 0; i--){
 		var id = peeps[i].id;
+		console.log(id);
 		if (id.substring(2, id.length) !== socket.id){
 			fill(155);
 			ellipse(peeps[i].x, peeps[i].y, 30, 30);
@@ -39,6 +41,7 @@ function draw() {
 }
 
 function mousePressed(){
+	console.log('mouse');
 	/*
 	if((mouseX >= peep.x - 40) && (mouseX <= peep.x + 40)
     && (mouseY >= peep.y - 40) && (mouseY <= peep.y + 40)){

@@ -36,7 +36,7 @@ io.sockets.on('connection',
 
     socket.on('update', //x undefined error from being first to party?
       function(data){
-        console.log(peeps);
+        //console.log(peeps.length);
         if (peeps.length >= 2){ //so only starts if at least 2 players?
           var peep;
           for (var i = 0; i < peeps.length; i++){
@@ -44,8 +44,8 @@ io.sockets.on('connection',
               peep = peeps[i];
             }
           }
-          peep.x = data.x;
-          peep.y = data.y
+          // peep.x = data.x;
+          // peep.y = data.y
         }
       }
     );
