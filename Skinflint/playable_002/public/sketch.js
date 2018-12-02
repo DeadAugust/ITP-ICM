@@ -1,55 +1,52 @@
-var socket;
+//var socket;
+var socket = io(); // I think this is what did it
 
-var peep;
-var peeps = [];
+var atman;
+var atmans = [];
 
 function setup() {
 	createCanvas(400, 400);
 	background(0,100,100);
-	socket = io.connect('http://localhost:3000');
-//set up with socket.id?
-	peep = new Peep (socket.id, random(50, width - 50), random(50, height-50));
+
+
+	atman = new Atman (socket.id, random(50, width - 50), random(50, height-50));
 
 	var data = {
-		id: peep.id,
-    x: peep.x,
-    y: peep.y
+		id: atman.id,
+    x: atman.x,
+    y: atman.y
   };
 
 	socket.emit('start', data);
 
 	socket.on('heartbeat',
 		function(data){
-			//console.log(data);
-			peeps = data;
+			atmans = data;
 		}
 	);
 }
 
 function draw() {
-	for (var i = peeps.length - 1; i >= 0; i--){
-		var id = peeps[i].id;
-		//console.log(id);
+	for (var i = atmans.length - 1; i >= 0; i--){
+		var id = atmans[i].id;
 		if (id !== socket.id){
 			fill(255);
-			ellipse(peeps[i].x, peeps[i].y, 30, 30);
+			ellipse(atmans[i].x, atmans[i].y, 30, 30);
 
 			fill(0);
 			textAlign(CENTER);
 			textSize(18);
-			text(peeps[i].id, peeps[i].x, peeps[i].y);
+			text(atmans[i].id, atmans[i].x, atmans[i].y);
 		}
 	}
-	peep.show(); //LOL
+	atman.show();
 	textSize(18);
 	fill(0);
-	text('me', peep.x - 2, peep.y + 5);
+	text('me', atman.x - 2, atman.y + 5);
 
 	var data = {
-		// id? not needed
-		x: peep.x,
-		y: peep.y
-		// s?
+		x: atman.x,
+		y: atman.y
 	};
 	socket.emit('update', data);
 	socket.on('msg',
@@ -61,22 +58,22 @@ function draw() {
 
 function mousePressed(){
 	/*
-	if((mouseX >= peep.x - 40) && (mouseX <= peep.x + 40)
-    && (mouseY >= peep.y - 40) && (mouseY <= peep.y + 40)){
+	if((mouseX >= atman.x - 40) && (mouseX <= atman.x + 40)
+    && (mouseY >= atman.y - 40) && (mouseY <= atman.y + 40)){
       clearTrade();
   }
 	*/
-	for (var i = peeps.length - 1; i >=0; i--){ //click to send msg
-		if((mouseX >= peeps[i].x - 30) && (mouseX <= peeps[i].x + 30)
-			&& (mouseY >= peeps[i].y - 30) && (mouseY <= peeps[i].y + 30)){
+	for (var i = atmans.length - 1; i >=0; i--){ //click to send msg
+		if((mouseX >= atmans[i].x - 30) && (mouseX <= atmans[i].x + 30)
+			&& (mouseY >= atmans[i].y - 30) && (mouseY <= atmans[i].y + 30)){
 				//clearTrade();
-				//peeps[i].s = true;
+				//atmans[i].s = true;
 				fill(255,255,0);
-				ellipse(peeps[i].x, peeps[i].y, 40, 40);
+				ellipse(atmans[i].x, atmans[i].y, 40, 40);
 				//target = true;
-				console.log(peeps[i].id);
+				console.log(atmans[i].id);
 				var data = {
-					idTo: peeps[i].id,
+					idTo: atmans[i].id,
 					idFrom: socket.id
 				}
 				socket.emit('msg', data);
@@ -84,7 +81,7 @@ function mousePressed(){
 	}
 }
 
-function Peep(id, x, y){
+function Atman(id, x, y){
   this.id = id;
 	this.x = x;
   this.y = y;
