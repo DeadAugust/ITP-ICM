@@ -34,15 +34,30 @@ io.sockets.on('connection',
       }
     );
 
-    socket.on('update',
+    socket.on('update', //x undefined error from being first to party?
       function(data){
-        var peep;
-        for (var i = 0; i < peeps.length; i++){
-          if (socket.id == peeps[i].id){
-            peep = peeps[i];
+        console.log(peeps);
+        if (peeps.length >= 2){ //so only starts if at least 2 players?
+          var peep;
+          for (var i = 0; i < peeps.length; i++){
+            if (socket.id == peeps[i].id){
+              peep = peeps[i];
+            }
           }
+          peep.x = data.x;
+          peep.y = data.y
         }
-        peep.x = data.x;
-        peep.y = data.y
+      }
+    );
+
+    socket.on('msg',
+      function(data){
+        socket.broadcast.to(data.id).emit('msg', data);
+      }
+    );
+
+    socket.on('disconnect',
+      function(data){
+        console.log("Client has disconnected");
       })
   })
