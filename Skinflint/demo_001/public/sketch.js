@@ -37,6 +37,7 @@ function setup() {
     g: atman.g,
     b: atman.b
   };
+  
   socket.emit('start', data);
 
   socket.on('heartbeat',

@@ -9,13 +9,29 @@ function setup() {
 	socket = io.connect('http://localhost:3000');
 //set up with socket.id?
 	peep = new Peep (socket.id, random(50, width - 50), random(50, height-50));
+
+	var data = {
+		id: peep.id,
+    x: peep.x,
+    y: peep.y
+  };
+
+	socket.emit('start', data);
+
+	socket.on('heartbeat',
+		function(data){
+			//console.log(data);
+			peeps = data;
+		}
+	);
 }
 
 function draw() {
 	for (var i = peeps.length - 1; i >= 0; i--){
 		var id = peeps[i].id;
-		if (id.substring(2, id.length) !== socket.id){
-			fill(155);
+		//console.log(id);
+		if (id !== socket.id){
+			fill(255);
 			ellipse(peeps[i].x, peeps[i].y, 30, 30);
 
 			fill(0);

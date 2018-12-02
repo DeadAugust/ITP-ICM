@@ -20,7 +20,7 @@ var io = require('socket.io')(server);
 
 //heartbeat needed?
 setInterval(heartbeat, 33);
-function heartbeat(){
+function heartbeat(){ //so this is the only thing sent from server???
   io.sockets.emit('heartbeat', peeps);
 }
 
