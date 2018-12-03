@@ -12,16 +12,43 @@ var redCol = 0;
 var greenCol = 0;
 var blueCol = 0;
 var shapeYes = true; //no shapes yet
-var colorYes = false;
-var nameYes = false;
-var joined = false;
+var colorYes = false; //if selected color
+var nameYes = false; //if input name
+var joined = false; //if they've left character creation
+var tutorial = false; //if they did the tutorial
+var gameSetup = false; //game setup after player creation UGH "setup"
 
-function setup() {
+//- - - - -  trading
+var tradeTarget = ' '; // player selected
+var tradeId; //player's id
+var tradeFud = ' '; // item selected
+// var tradeCan = false; //if both above are true, can trade
+var tradeButt; //trade button
+var tatos, morks, upples; //fud buttons
+//fud item containers
+var tato = 0;
+var mork = 0;
+var upple= 0;
+//trade quantity
+var tato4u = 0;
+var mork4u = 0;
+var upple4u = 0;
+//debounce
+var oneTrade = true; //trade debounce;
+// var getOne; //trade debounce?
+var tradeTime = 1000;// for trade
+// var thisTime = 100;//for button
+var lastTrade = 0;
+// var lastTime = 0;
+var debounce = 500;
+
+function setup(){
+	// console.log('test');
 	//- - - - - overall
 	var canvas = createCanvas(400, 600);
  	canvas.parent('myCanvas');
-	bgColor = color(0, 150, 50); //should have same bg I guess
-	background(bgColor);
+	// bgColor = color(0, 150, 50); //should have same bg I guess
+	background(0, 150, 50);
 	textAlign(CENTER);
 
 	// - - - - -  player start screen
@@ -34,7 +61,7 @@ function setup() {
 	greenSlide.position(width/3, 3 * height/7);
 	blueSlide = createSlider(0,255,188);
 	blueSlide.position(width/3, 3 * height/7 + height/20);
-	colorChoose = createButton('I want to be this color!')
+	colorChoose = createButton('I want to be this color!');
 	colorChoose.parent('myCanvas'); //need?
 	colorChoose.position(width/3, 4 * height/7);
 	colorChoose.mousePressed(colorPush);
@@ -49,13 +76,11 @@ function setup() {
 
 
 	// - - - - - heartbeat
-	if(joined){
-		socket.on('heartbeat',
-			function(data){
-				atmans = data;
-			}
-		);
-	}
+	socket.on('heartbeat',
+		function(data){
+			atmans = data;
+		}
+	);
 }
 
 function draw() {
@@ -86,18 +111,46 @@ function draw() {
 			text('blue', width/4, 3 * height/7 + height/20);
 		}
 	}
+	else if (!gameSetup){
+		if (!tutorial){
+			startingFud = int(random(3));
+			if (startingFud == 0){
+				tato++;
+			}
+			else if (startingFud == 1){
+				mork++;
+			}
+			else{
+				upple++;
+			}
+		}
+		tatos = createButton('tatos: ' + tato);
+		tatos.mousePressed(tradeTato);
+		morks = createButton('morks: ' + mork);
+		morks.mousePressed(tradeMork);
+		upples = createButton('upples:' + upple);
+		upples.mousePressed(tradeUpple);
+		gameSetup = true;
+	}
 	else{ //- - - - - after setup
-		startButt.hide();
-		background(bgColor);
+		// startButt.hide();
+		background(0, 150, 50);
+		//update map
 		for (var i = atmans.length - 1; i >= 0; i--){
 			var id = atmans[i].id;
 			if (id !== socket.id){
-				fill(255);
+				noStroke();
+				fill(atmans[i].r, atmans[i].g, atmans[i].b);
 				ellipse(atmans[i].x, atmans[i].y, 30, 30);
-
+				if(atmans[i].id == tradeId){
+					stroke(255,255,0);
+					strokeWeight(6);
+					ellipse(atmans[i].x, atmans[i].y, 40, 40);
+				}
+				noStroke();
 				fill(0);
 				textSize(18);
-				text(atmans[i].id, atmans[i].x, atmans[i].y);
+				text(atmans[i].name, atmans[i].x, atmans[i].y + 40);
 			}
 		}
 		atman.show();
@@ -108,14 +161,38 @@ function draw() {
 
 		var data = {
 			x: atman.x,
-			y: atman.y
+			y: atman.y,
 		};
 		socket.emit('update', data);
+
+		if (tradeTarget !== ' ' && tradeFud !== ' '){
+			if (oneTrade){
+				tradeButt = createButton('Trade ' + tradeTarget + " a" + tradeFud);
+				tradeButt.mousePressed(trade);
+				oneTrade = false;
+			}
+		}
+
+		socket.on('trade',
+			function(data){
+				tradeTime = millis();
+				if(tradeTime - lastTrade >= debounce){
+					tato += data.idTato;
+					mork += data.idMork;
+					upple += data.idUpple;
+					console.log('trade from ' + data.nameFrom);
+					buttonRefresh();
+					lastTrade = tradeTime;
+				}
+			}
+		);
+		/*
 		socket.on('msg',
 			function (data){
 				console.log('msg from: ' + data.idFrom);
 			}
 		);
+		*/
 	}
 }
 
@@ -126,24 +203,65 @@ function mousePressed(){ //can i make mousePressed an Atman method thing?
       clearTrade();
   }
 	*/
+	console.log('trade fud:');
+	console.log(tradeFud);
+	console.log("trade target:");
+	console.log(tradeTarget);
+	console.log('tradebutt:');
+	console.log(tradeButt);
 	for (var i = atmans.length - 1; i >=0; i--){ //click to send msg
 		if((mouseX >= atmans[i].x - 30) && (mouseX <= atmans[i].x + 30)
 			&& (mouseY >= atmans[i].y - 30) && (mouseY <= atmans[i].y + 30)){
 				//clearTrade();
-				//atmans[i].s = true;
-				fill(255,255,0);
-				ellipse(atmans[i].x, atmans[i].y, 40, 40);
-				//target = true;
-				console.log(atmans[i].id);
+				// if(!atmans[i].select){ //if unselected, select
+					tradeTarget = atmans[i].name;
+					tradeId = atmans[i].id;
+					console.log(tradeId);
+
+				// }
+				// else{ //if selected, unselect
+				// 	// atmans[i].select = false;
+				// 	tradeTarget = ' ';
+				// }
+				// fill(255,255,0);
+				// ellipse(atmans[i].x, atmans[i].y, 40, 40);
+
+				/* msg test
 				var data = {
 					idTo: atmans[i].id,
 					idFrom: socket.id
 				}
 				socket.emit('msg', data);
+				*/
 		}
 	}
 }
 
+function Atman(id, x, y, name, r, g, b){
+  this.id = id;
+	this.x = x;
+  this.y = y;
+	this.name = name;
+	this.r = r;
+	this.g = g;
+	this.b = b;
+	// this.col = color(r, g, b);
+	// this.select = false;
+
+  this.show = function(){
+		// if (this.select){
+		// 	stroke(255,255,0);
+		// 	strokeWeight(6);
+		// }
+		// else{
+		// 	stroke(0);
+		// 	strokeWeight(3);
+		// }
+		noStroke();
+    fill(this.r, this.g, this.b);
+    ellipse(this.x, this.y, 40, 40);
+  }
+}
 
 function playerName(){
 	if (name !== 'me' && name !== 'Me' && name !== 'type name here'){
@@ -183,7 +301,9 @@ function newPlayer(){
 		x: atman.x,
 		y: atman.y,
 		name: atman.name,
-		col: atman.col
+		r: atman.redCol,
+		g: atman.greenCol,
+		b: atman.blueCol
 	};
 
 	socket.emit('start', data);
@@ -191,24 +311,66 @@ function newPlayer(){
 	startButt.hide();
 }
 
-function Atman(id, x, y, name, r, g, b){
-  this.id = id;
-	this.x = x;
-  this.y = y;
-	this.name = name;
-	this.col = color(r, g, b);
-	this.select = false;
+function trade(){
+	// if (!oneTrade){
+	tato -= tato4u;
+	mork -= mork4u;
+	upple -= upple4u;
+	var data = {
+		idTo: tradeId,
+		idFrom: socket.id,
+		nameTo: tradeTarget,
+		nameFrom: atman.name,
+		idTato: tato4u,
+		idMork: mork4u,
+		idUpple: upple4u
+	}
+	socket.emit('trade', data);
+	resetTrade();
+	// }
+}
 
-  this.show = function(){
-		if (this.select){
-			stroke(255,255,0);
-			strokeWeight(6);
-		}
-		else{
-			stroke(0);
-			strokeWeight(3);
-		}
-    fill(this.col);
-    ellipse(this.x, this.y, 40, 40);
-  }
+// function showTrade(){
+// 	if (tato4u)
+// }
+function buttonRefresh(){
+	tatos.remove();
+	morks.remove();
+	upples.remove();
+	tatos = createButton('tatos: ' + tato);
+	tatos.mousePressed(tradeTato);
+	morks = createButton('morks: ' + mork);
+	morks.mousePressed(tradeMork);
+	upples = createButton('upples:' + upple);
+	upples.mousePressed(tradeUpple);
+}
+function resetTrade(){
+	tradeFud = ' ';
+	oneTrade = true;
+	tradeButt.remove();
+	tato4u = 0;
+	mork4u = 0;
+	upple4u = 0;
+	buttonRefresh();
+}
+
+function tradeTato(){
+	tradeFud = ' tato';
+	tato4u = 1;
+	mork4u = 0;
+	upple4u = 0;
+}
+
+function tradeMork(){
+	tradeFud = ' mork';
+	tato4u = 0;
+	mork4u = 1;
+	upple4u = 0;
+}
+
+function tradeUpple(){
+	tradeFud = 'n upple';
+	tato4u = 0;
+	mork4u = 0;
+	upple4u = 1;
 }
