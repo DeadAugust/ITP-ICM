@@ -85,16 +85,15 @@ io.sockets.on('connection',
         }
       }
     );
-    /* msg test
-    socket.on('msg',
-      function(data){
-        socket.broadcast.to(data.idTo).emit('msg', data);
-        console.log(data);
-      }
-    );
-    */
     socket.on('disconnect',
       function(data){
+        var atman;
+        for (var i = 0; i < atmans.length; i++){
+          if (socket.id == atmans[i].id){
+            atmans.splice(i, 1);
+          }
+        }
+
         console.log("Client has disconnected");
       })
   })
