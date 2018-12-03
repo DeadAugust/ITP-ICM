@@ -51,6 +51,7 @@ io.sockets.on('connection',
       function(data){
         var atman = new Atman(socket.id, data.x, data.y, data.name, data.r, data.g, data.b);
         atmans.push(atman);
+        console.log(atmans);
       }
     );
 

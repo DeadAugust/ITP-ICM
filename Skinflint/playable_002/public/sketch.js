@@ -155,7 +155,12 @@ function draw() {
 		}
 		atman.show();
 		textSize(18);
-		fill(0);
+		if (((atman.r + atman.g + atman.b) / 3) < 100){
+			fill(255);
+		}
+		else {
+			fill(0);
+		}
 		noStroke();
 		text('me', atman.x, atman.y + 5);
 
@@ -295,18 +300,19 @@ function hideDom(){ //all but start
 function newPlayer(){
 	atman = new Atman (socket.id, random(50, width - 50), random(50, height-50),
 	 name, redCol, greenCol, blueCol);
-
+	 console.log(redCol);
 	var data = {
 		id: atman.id,
 		x: atman.x,
 		y: atman.y,
 		name: atman.name,
-		r: atman.redCol,
-		g: atman.greenCol,
-		b: atman.blueCol
+		r: redCol,
+		g: greenCol,
+		b: blueCol
 	};
 
 	socket.emit('start', data);
+	console.log(data);
 	joined = true;
 	startButt.hide();
 }
@@ -355,22 +361,28 @@ function resetTrade(){
 }
 
 function tradeTato(){
-	tradeFud = ' tato';
-	tato4u = 1;
-	mork4u = 0;
-	upple4u = 0;
+	if(tato >= 1){
+		tradeFud = ' tato';
+		tato4u = 1;
+		mork4u = 0;
+		upple4u = 0;
+	}
 }
 
 function tradeMork(){
-	tradeFud = ' mork';
-	tato4u = 0;
-	mork4u = 1;
-	upple4u = 0;
+	if(mork >= 1){
+		tradeFud = ' mork';
+		tato4u = 0;
+		mork4u = 1;
+		upple4u = 0;
+	}
 }
 
 function tradeUpple(){
-	tradeFud = 'n upple';
-	tato4u = 0;
-	mork4u = 0;
-	upple4u = 1;
+	if(upple >= 1){
+		tradeFud = 'n upple';
+		tato4u = 0;
+		mork4u = 0;
+		upple4u = 1;
+	}
 }
