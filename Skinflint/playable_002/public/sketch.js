@@ -197,6 +197,9 @@ function draw() {
 		var data = {
 			x: atman.x,
 			y: atman.y,
+			t: tato,
+			m: mork,
+			u: upple
 		};
 		socket.emit('update', data);
 
@@ -264,7 +267,7 @@ function mouseDragged(){
 //need to toggle so only during game, not setup?
 	for (var i = atmans.length -1; i >= 0; i--){ //could be fun if they're repelling away from items
 		if (socket.id !== atmans[i].id){
-			if (dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100){
+			if (dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100){ //why isn't this working anymore?
 				atman.x = mouseX;
 				atman.y = mouseY;
 				atman.show();
@@ -299,14 +302,14 @@ function Atman(id, x, y, name, r, g, b){
   }
 }
 
-function playerName(){
-	if (name !== 'me' && name !== 'Me' && name !== 'type name here'){
+function playerName(){ //for faster debugging
+	// if (name !== 'me' && name !== 'Me' && name !== 'type name here'){
 		name = input.value();
 		nameYes = true;
-	}
-	else{
-		input.value('please type a different name');
-	}
+	// }
+	// else{
+		// input.value('please type a different name');
+	// }
 
 }
 
@@ -341,7 +344,6 @@ function newPlayer(){
 		g: greenCol,
 		b: blueCol
 	};
-
 	socket.emit('start', data);
 	console.log(data);
 	joined = true;
