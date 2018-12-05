@@ -41,7 +41,7 @@ app.use(express.static('public'));
 console.log('Socket server running');
 
 var io = require('socket.io')(server);
-var shared = io.of('/sharedScreen')
+// var shared = io.of('/sharedScreen')
 
 //new
 // app.get('/sample', function(req,res){
@@ -166,7 +166,7 @@ io.sockets.on('connection',
 
     socket.on('gameOver',
       function(){
-        socket.broadcast.emit('gameOver');
+        socket.broadcast.emit('gameOverC');
         fudMath();
       }
     );
@@ -185,13 +185,13 @@ io.sockets.on('connection',
   })
 
   //shared room?
-  shared.on('connection',
-    function(socket){
-      console.log("shared Screen: " + socket.id);
-
-
-    }
-  )
+  // shared.on('connection',
+  //   function(socket){
+  //     console.log("shared Screen: " + socket.id);
+  //
+  //
+  //   }
+  // )
 
 //- - - - - - - in-game fud ranking //if even at start, no bad?
 function rank(){

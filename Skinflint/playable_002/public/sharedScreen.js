@@ -38,6 +38,7 @@ function setup(){
 
   socket.on('rankCheck',
     function(data){
+      console.log(tRank, mRank, uRank);
       if(data.tRank == -1){
         badTatos = true;
         badMorks = false;

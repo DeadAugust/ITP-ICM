@@ -240,7 +240,7 @@ function draw() {
 			}
 		);
 
-		socket.on('gameOver',
+		socket.on('gameOverC',
 			function(){
 				gameOver = true;
 			}
