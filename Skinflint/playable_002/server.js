@@ -39,6 +39,34 @@ console.log('Socket server running');
 
 var io = require('socket.io')(server);
 
+//new
+// app.get('/sample', function(req,res){
+//   res.send('this sampless');
+// });
+/*
+var router = express.Router();
+
+router.get('/', function(req, res){
+  res.sendFile('/sketch.js');
+});
+
+router.get('/sharedScreen', function(req,res){
+  res.sendFile('/sharedScreen.js');
+});
+
+app.use('/',router);
+*/
+
+var path = require('path');
+
+app.get('/', function(req, res){
+  res.sendFile(path.join(__dirname + '/public/index.html'));
+});
+
+app.get('/sharedScreen', function(req,res){
+  res.sendFile(path.join(__dirname + '/public/sharedIndex.html'));
+});
+
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
   io.sockets.emit('heartbeat', atmans);
