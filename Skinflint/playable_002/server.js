@@ -80,6 +80,7 @@ var startGame = false; //whether or not game has started
 io.sockets.on('connection',
   function(socket){
     console.log("new player: " + socket.id);
+
     socket.on('start',
       function(data){
         var atman = new Atman(socket.id, data.x, data.y, data.name, data.r, data.g, data.b);
@@ -91,7 +92,7 @@ io.sockets.on('connection',
     socket.on('startGame',
       function(){
         startGame = true;
-
+        console.log(startGame);
       })
 
     socket.on('update', //x undefined error from being first to party?
