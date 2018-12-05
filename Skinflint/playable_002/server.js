@@ -44,6 +44,11 @@ function heartbeat(){ //so this is the only thing sent from server???
   io.sockets.emit('heartbeat', atmans);
 }
 
+//
+var startGame = false; //whether or not game has started
+// var time
+
+
 io.sockets.on('connection',
   function(socket){
     console.log("new player: " + socket.id);
@@ -54,6 +59,12 @@ io.sockets.on('connection',
         console.log(atmans);
       }
     );
+
+    socket.on('startGame',
+      function(){
+        startGame = true;
+
+      })
 
     socket.on('update', //x undefined error from being first to party?
       function(data){
