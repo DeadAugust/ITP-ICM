@@ -45,6 +45,9 @@ var debounce = 500;
 //- - - - - - - - map
 var slots = []; //nested array?
 
+//- - - - - - - - game over
+var gameOver = false; //if time's up
+
 function setup(){
 	//- - - - - overall
 	var screenSize = windowHeight - 100;
@@ -145,7 +148,13 @@ function draw() {
 		upples.mousePressed(tradeUpple);
 		gameSetup = true;
 	}
-	else{ //- - - - - after setup
+	else if(gameOver){
+		background(100, 0, 40);
+		textSize(40);
+		fill(0);
+		text('times up!', width/2, height/2);
+	}
+	else{ //- - - - - after setup, main game
 		// startButt.hide();
 		background(0, 150, 50); //where can I put this?
 		if (tradeMsg){
@@ -225,6 +234,12 @@ function draw() {
 					tradeMsg = true;
 					lastTrader = data.nameFrom;
 				}
+			}
+		);
+
+		socket.on('gameOver',
+			function(){
+				gameOver = true;
 			}
 		);
 	}

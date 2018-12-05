@@ -125,6 +125,13 @@ io.sockets.on('connection',
         }
       }
     );
+
+    socket.on('gameOver',
+      function(){
+        socket.broadcast.emit('gameOver');
+      }
+    );
+
     socket.on('disconnect',
       function(data){
         var atman;
@@ -133,7 +140,7 @@ io.sockets.on('connection',
             atmans.splice(i, 1);
           }
         }
-
         console.log("Client has disconnected");
-      })
+      }
+    );
   })
