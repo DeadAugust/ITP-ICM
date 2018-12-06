@@ -180,7 +180,8 @@ function draw() {
 		text('times up!', width/2, height/2);
 	}
 	else{ //- - - - - after setup, main game
-		background(0, 150, 50); //where can I put this?
+		// background(0, 150, 50); //where can I put this?
+		background(mapTiles[atman.tile].r,mapTiles[atman.tile].g,mapTiles[atman.tile].b)
 		if (tradeMsg){
 			stroke(255);
 			strokeWeight(2);
@@ -192,7 +193,7 @@ function draw() {
 		//update map
 		for (var i = atmans.length - 1; i >= 0; i--){
 			var id = atmans[i].id;
-			if (id !== socket.id){
+			if ((id !== socket.id)&&(atman.tile == atmans[i].tile)){
 				noStroke();
 				fill(atmans[i].r, atmans[i].g, atmans[i].b);
 				ellipse(atmans[i].x, atmans[i].y, 30, 30);

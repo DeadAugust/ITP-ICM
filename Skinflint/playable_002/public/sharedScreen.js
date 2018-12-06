@@ -102,15 +102,16 @@ function draw (){
   else if(startTime){
     //map
 
-    textSize(height/10);
+    // textSize(height/10);
     background(0,150,50);
     rectMode(CORNER);
+    textSize(height/(14 + atmans.length));
     for (var i = 0; i < mapTiles.length; i++){
       mapTiles[i].show();
       mapTiles[i].nameCount = 1;
       for (var j = atmans.length -1; j >= 0; j--){
         if(atmans[j].tile == i){
-          console.log('daidfidfidf');
+          // console.log('daidfidfidf');
           fill(atmans[j].r, atmans[j].g, atmans[j].b);
           mapTiles[i].gps(atmans[j].name);
         }
@@ -141,11 +142,11 @@ function draw (){
     rectMode(CENTER);
     noStroke();
     fill(0);
-    rect(fudBlack, height/7, width/4, height/7);
+    rect(fudBlack, height/7, width/5, height/7);
     strokeWeight(5);
     stroke(255, 219, 77);//gold
     noFill();
-    rect(fudGold, height/7, width/4, height/7);
+    rect(fudGold, height/7, width/5, height/7);
     noStroke();
     fill(255, 153, 0)//orange tatos
     text('TATOS', 5 * width/36, height/6);
