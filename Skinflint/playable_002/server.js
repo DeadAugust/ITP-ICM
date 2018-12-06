@@ -5,7 +5,6 @@ function Atman(id, x, y, name, r, g, b){
   this.x = x;
   this.y = y;
   this.name = name;
-  // this.col = col;
   this.r = r;
   this.g = g;
   this.b = b;
@@ -44,23 +43,6 @@ var io = require('socket.io')(server);
 // var shared = io.of('/sharedScreen')
 
 //new
-// app.get('/sample', function(req,res){
-//   res.send('this sampless');
-// });
-/*
-var router = express.Router();
-
-router.get('/', function(req, res){
-  res.sendFile('/sketch.js');
-});
-
-router.get('/sharedScreen', function(req,res){
-  res.sendFile('/sharedScreen.js');
-});
-
-app.use('/',router);
-*/
-
 var path = require('path');
 
 app.get('/', function(req, res){
@@ -106,9 +88,8 @@ io.sockets.on('connection',
         console.log(startGame);
       })
 
-    socket.on('update', //x undefined error from being first to party?
+    socket.on('update',
       function(data){
-        // console.log(atmans.length);
         if (atmans.length >= 2){ //so only starts if at least 2 players?
           var atman;
           totalTatos = 0;
@@ -162,13 +143,12 @@ io.sockets.on('connection',
         console.log('rankCheck ' + socket.id);
         io.to(socket.id).emit('rankCheck', data);
         // socket.broadcast.to(socket.id).emit('rankCheck', data); //broadcast bad?
-        // console.log('rankCheck');
       }
     );
 
     socket.on('gameOver',
       function(){
-        socket.broadcast.emit('gameOverC');
+        socket.broadcast.emit('gameOverC'); //just testing client vs main
         fudMath();
       }
     );
@@ -184,16 +164,8 @@ io.sockets.on('connection',
         console.log("Client has disconnected");
       }
     );
-  })
-
-  //shared room?
-  // shared.on('connection',
-  //   function(socket){
-  //     console.log("shared Screen: " + socket.id);
-  //
-  //
-  //   }
-  // )
+  }
+)
 
 //- - - - - - - in-game fud ranking //if even at start, no bad?
 function rank(){
@@ -216,7 +188,7 @@ function rank(){
       uppleRank = -1;
     }
   else{
-    console.log('rank bumb');
+    console.log('rank bumb'); //meaningless test
     }
   }
 

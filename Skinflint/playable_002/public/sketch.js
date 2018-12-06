@@ -1,5 +1,4 @@
-//var socket;
-var socket = io(); // I think this is what did it
+var socket = io();
 
 var atman;
 var atmans = [];
@@ -53,7 +52,6 @@ function setup(){
 	var screenSize = windowHeight - 100;
 	var canvas = createCanvas(int(screenSize * .666), screenSize);
  	canvas.parent('myCanvas');
-	// bgColor = color(0, 150, 50); //should have same bg I guess
 	background(0, 150, 50);
 	textAlign(CENTER);
 
@@ -155,7 +153,6 @@ function draw() {
 		text('times up!', width/2, height/2);
 	}
 	else{ //- - - - - after setup, main game
-		// startButt.hide();
 		background(0, 150, 50); //where can I put this?
 		if (tradeMsg){
 			stroke(255);
@@ -383,9 +380,6 @@ function trade(){
 	lastTrader = data.nameTo;
 }
 
-// function showTrade(){
-// 	if (tato4u)
-// }
 function buttonRefresh(){
 	tatos.remove();
 	morks.remove();
@@ -397,6 +391,7 @@ function buttonRefresh(){
 	upples = createButton('upples:' + upple);
 	upples.mousePressed(tradeUpple);
 }
+
 function resetTrade(){
 	tradeFud = ' ';
 	oneTrade = true;

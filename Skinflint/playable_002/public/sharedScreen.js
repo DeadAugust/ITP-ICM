@@ -12,7 +12,6 @@ var timer; //millis tracker
 var clock; //countdown display
 var clockMin;
 var clockSec;
-// var stopTest = false;
 
 // - - - - - fud ranking
 var badTatos = false;
@@ -33,31 +32,6 @@ function setup(){
   //   function(data){
   //     // socket.emit('rankCheck?');
   //     // console.log('emit');
-  //   }
-  // );
-
-  // socket.on('rankCheck',
-  //   function(data){
-  //     console.log(tRank, mRank, uRank);
-  //     if(data.tRank == -1){
-  //       badTatos = true;
-  //       badMorks = false;
-  //       badUpples = false;
-  //       console.log('Tato Rank: bad');
-  //     }
-  //     if(data.mRank == -1){
-  //       badTatos = false;
-  //       badMorks = true;
-  //       badUpples = false;
-  //       console.log('Mork Rank: bad');
-  //     }
-  //     if(data.uRank == -1){
-  //       badTatos = false;
-  //       badMorks = false;
-  //       badUpples = true;
-  //       console.log('Upple Rank: bad');
-  //     }
-  //     console.log('rankkkkkk');
   //   }
   // );
 }
