@@ -3,7 +3,7 @@ var socket = io();
 var atman;
 var atmans = [];
 
-var bgColor;
+// var bgColor;
 //- - - - - player setup
 var input, submit, redSlide, greenSlide, blueSlide, colorChoose, startButt;
 var name = ' ';
