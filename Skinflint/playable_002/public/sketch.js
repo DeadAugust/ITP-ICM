@@ -48,6 +48,7 @@ var uppleCol;
 //- - - - - - - - map
 // var slots = []; //nested array?
 var mapTiles = [];
+var upButt, downButt, leftButt, rightButt; //movement
 //- - - - - - - - game over
 var gameOver = false; //if time's up
 

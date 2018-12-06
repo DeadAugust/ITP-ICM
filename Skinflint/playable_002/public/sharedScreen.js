@@ -63,15 +63,15 @@ socket.emit('startMap', mapTiles);
   socket.on('heartbeat',
     function(data){
       atmans = data.atmans;
-      console.log(atmans);
+      // console.log(atmans);
+      console.log(mapTiles);
       for(var i = 0; i < mapTiles.length; i++){
         mapTiles[i].names = 0;
       }
-      for(var j = data.atmans.length -1; j >= 0; j--){
-        var location = data.atmans[j].tile;
+      for(var j = atmans.length -1; j >= 0; j--){
+        var location = atmans[j].tile;
         // mapTiles[location].names.push(data.atmans[j].name);
         mapTiles[location].names++;
-
       }
     }
   );
@@ -109,7 +109,8 @@ function draw (){
       mapTiles[i].show();
       mapTiles[i].nameCount = 1;
       for (var j = atmans.length -1; j >= 0; j--){
-        if(atmans[j].tile == mapTiles[i]){
+        if(atmans[j].tile == i){
+          console.log('daidfidfidf');
           fill(atmans[j].r, atmans[j].g, atmans[j].b);
           mapTiles[i].gps(atmans[j].name);
         }
@@ -183,19 +184,19 @@ function draw (){
           badTatos = true;
           badMorks = false;
           badUpples = false;
-          console.log('Tato Rank: bad');
+          // console.log('Tato Rank: bad');
         }
         if(data.mRank == -1){
           badTatos = false;
           badMorks = true;
           badUpples = false;
-          console.log('Mork Rank: bad');
+          // console.log('Mork Rank: bad');
         }
         if(data.uRank == -1){
           badTatos = false;
           badMorks = false;
           badUpples = true;
-          console.log('Upple Rank: bad');
+          // console.log('Upple Rank: bad');
         }
         if(data.tRank == 2){
           goodTatos = true;
