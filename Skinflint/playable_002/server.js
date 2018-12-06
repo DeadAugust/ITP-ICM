@@ -152,14 +152,16 @@ io.sockets.on('connection',
       }
     );
 
-    socket.on('rankCheck',
+    socket.on('rankCheck?',
       function(data){
         var data = {
           tRank: tatoRank,
           mRank: morkRank,
           uRank: uppleRank
         }
-        socket.broadcast.emit('rankCheck', data); //broadcast bad?
+        console.log('rankCheck ' + socket.id);
+        io.to(socket.id).emit('rankCheck', data);
+        // socket.broadcast.to(socket.id).emit('rankCheck', data); //broadcast bad?
         // console.log('rankCheck');
       }
     );
