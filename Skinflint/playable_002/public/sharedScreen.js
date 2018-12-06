@@ -26,6 +26,8 @@ var goodUpples = false;
 
 //- - - - - - - - - final scores
 var finalScores = false;
+var atmanRanks = [];
+var hLine; //score spacing
 
 function setup(){
   createCanvas(windowWidth-100,windowHeight-100);
@@ -67,14 +69,23 @@ mapTiles.push(tile8);
 function draw (){
   // background(20, 200, 100); //sandbox start where all avatars are?
   if(finalScores){
-    strokeWeight(4);
-    stroke(255);
-    fill(0);
-    // noStroke();
-    // rectMode(CENTER);
-    // rect(6*width/7, height/7, width/4, height/5);
-    // fill(255);
-    text("0:00", 5 * width/6, height/7);
+    // textSize(height/10);
+    // background(51, 204, 51);
+    // strokeWeight(4);
+    // stroke(255);
+    // fill(0);
+    // text("0:00", 5 * width/6, height/7);
+    noStroke();
+    fill(0, 102, 153);
+    textSize(height/8);
+    text('FINAL SCORES:', width/2, height/8);
+    textSize(height/(8 + atmanRanks.length));
+    hLine = (height-100)/(atmanRanks.length + 1);
+    for(var i = 0; i < atmanRanks.length; i++){
+      var place = i +1;
+      text(place + ". " + atmanRanks[i].name + ": " + atmanRanks[i].pts, width/2, ((i+1) * hLine) + 100);
+    }
+
   }
   else if(startTime){
     //map
@@ -83,7 +94,6 @@ function draw (){
     rectMode(CORNER);
     for (var i = 0; i < mapTiles.length; i++){
       mapTiles[i].show();
-      // rect(mapTiles[i].x, mapTiles[i].y, mapTiles[i].w, mapTiles[i].h);
     }
     //fud Status
     var fudBlack;
@@ -128,14 +138,9 @@ function draw (){
     clockMin = int(clock / 60);
     clockSec = int(clock % 60);
     textSize(height/10);
-    // noStroke();
     strokeWeight(4);
     stroke(0);
     fill(255);
-    // rectMode(CENTER);
-    // rect(6*width/7, height/7, width/4, height/5);
-    // fill(255);
-    // textSize(50);
     if (clockSec < 10){
       text(clockMin + ":0" + clockSec, 5 * width/6, height/7);
     }
@@ -143,7 +148,7 @@ function draw (){
     if(millis() - timer >= timeLimit){
       socket.emit('gameOver');
       console.log('game over');
-      finalScores = true;
+      // finalScores = true;
     }
 
     socket.on('rankCheck',
@@ -167,17 +172,17 @@ function draw (){
           badUpples = true;
           console.log('Upple Rank: bad');
         }
-        if(data.tRank == 1){
+        if(data.tRank == 2){
           goodTatos = true;
           goodMorks = false;
           goodUpples = false;
         }
-        if(data.mRank == 1){
+        if(data.mRank == 2){
           goodTatos = false;
           goodMorks = true;
           goodUpples = false;
         }
-        if(data.uRank == 1){
+        if(data.uRank == 2){
           goodTatos = false;
           goodMorks = false;
           goodUpples = true;
@@ -185,7 +190,12 @@ function draw (){
         // console.log('rankkkkkk');
       }
     );
-    // console.log(badTatos, badMorks, badUpples);
+
+    socket.on('finalScores',
+      function(data){
+        atmanRanks = data;
+        finalScores = true;
+      })
   }
 }
 

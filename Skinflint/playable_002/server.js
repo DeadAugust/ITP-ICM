@@ -62,13 +62,14 @@ function heartbeat(){ //so this is the only thing sent from server???
 var startGame = false; //whether or not game has started
 // var time
 
+var sharedScreenId;
 
 //- - - - - - overall fud counts + points
 var totalTatos, totalMorks, totalUpples, totalFud; //across whole game
 var pointScale = 200; //points
 var tatoPts, morkPts, upplePts;//end game value percentage for each fud type
 var tatoRank, morkRank, uppleRank;//negative flip if middle rank
-
+var atmanRanks = []; //final score rankings
 // - - - - - - - events
 io.sockets.on('connection',
   function(socket){
@@ -112,7 +113,7 @@ io.sockets.on('connection',
           totalFud = totalTatos + totalMorks + totalUpples;
           // console.log(totalFud, totalTatos, totalMorks, totalUpples);
           rank();
-          console.log(tatoRank, morkRank, uppleRank);
+          // console.log(tatoRank, morkRank, uppleRank);
 
         }
       }
@@ -135,13 +136,14 @@ io.sockets.on('connection',
 
     socket.on('rankCheck?',
       function(data){
+        sharedScreenId = socket.id;
         var data = {
           tRank: tatoRank,
           mRank: morkRank,
           uRank: uppleRank
         }
         // console.log('rankCheck ' + socket.id);
-        io.to(socket.id).emit('rankCheck', data);
+        io.to(sharedScreenId).emit('rankCheck', data);
         // socket.broadcast.to(socket.id).emit('rankCheck', data); //broadcast bad?
       }
     );
@@ -150,6 +152,22 @@ io.sockets.on('connection',
       function(){
         socket.broadcast.emit('gameOverC'); //just testing client vs main
         fudMath();
+        for (var i = atmans.length - 1; i >= 0; i--){
+          var myTatoPts, myMorkPts, myUpplePts, myPts;
+          myTatoPts = atmans[i].t * tatoPts;
+          myMorkPts = atmans[i].m * morkPts;
+          myUpplePts = atmans[i].u * upplePts;
+          myPts = myTatoPts + myMorkPts + myUpplePts;
+          var endman = {
+            name: atmans[i].name,
+            pts: myPts
+          }
+          atmanRanks.push(endman);
+        }
+        // console.log(atmanRanks);
+        rankSort();
+        // console.log(atmanRanks);
+        io.to(sharedScreenId).emit('finalScores', atmanRanks);
       }
     );
 
@@ -169,54 +187,34 @@ io.sockets.on('connection',
 
 //- - - - - - - in-game fud ranking //if even at start, no bad?
 function rank(){
-  /*
-  if (((totalTatos > totalMorks) || (totalTatos > totalUpples))
-    && ((totalTatos < totalMorks) || (totalTatos < totalUpples))){
-      tatoRank = -1;
-      morkRank = 1;
-      uppleRank = 1;
-    }
-  else if (((totalMorks > totalTatos) || (totalMorks > totalUpples))
-    && ((totalMorks < totalTatos) || (totalMorks < totalUpples))){ //else if?
-      tatoRank = 1;
-      morkRank = -1;
-      uppleRank = 1;
-    }
-  else if (((totalUpples > totalTatos) || (totalUpples > totalMorks))
-    && ((totalUpples < totalTatos) || (totalUpples < totalMorks))){ //else if?
-      tatoRank = 1;
-      morkRank = 1;
-      uppleRank = -1;
-    }
-    */
   if (totalTatos > totalMorks && totalTatos <= totalUpples){
     tatoRank = -1;
-    morkRank = 1;
-    uppleRank = 0;
+    morkRank = 2;
+    uppleRank = 1;
   }
   else if(totalTatos > totalUpples && totalTatos <= totalMorks){
     tatoRank = -1;
-    morkRank = 0;
-    uppleRank = 1;
+    morkRank = 1;
+    uppleRank = 2;
   }
   else if(totalMorks > totalUpples && totalMorks <= totalTatos){
-    tatoRank = 0;
+    tatoRank = 1;
+    morkRank = -1;
+    uppleRank = 2;
+  }
+  else if(totalMorks > totalTatos && totalMorks <= totalUpples){
+    tatoRank = 2;
     morkRank = -1;
     uppleRank = 1;
   }
-  else if(totalMorks > totalTatos && totalMorks <= totalUpples){
-    tatoRank = 1;
-    morkRank = -1;
-    uppleRank = 0;
-  }
   else if(totalUpples > totalTatos && totalUpples <= totalMorks){
-    tatoRank = 1;
-    morkRank = 0;
+    tatoRank = 2;
+    morkRank = 1;
     uppleRank = -1;
   }
   else{
-    tatoRank = 0;
-    morkRank = 1;
+    tatoRank = 1;
+    morkRank = 2;
     uppleRank = -1;
     // console.log('rank bumb'); //meaningless test
     }
@@ -227,7 +225,32 @@ function rank(){
 // - - - - - - fud math at end
 function fudMath(){
   totalFud = totalTatos + totalMorks + totalUpples;
-  tatoPts = totalTatos / totalFud * pointScale * tatoRank;
-  morkPts = totalMorks / totalFud * pointScale * morkRank;
-  upplePts = totalUpples / totalFud * pointScale * uppleRank;
+  tatoPts = Math.floor(totalTatos / totalFud * pointScale * tatoRank);
+  morkPts = Math.floor(totalMorks / totalFud * pointScale * morkRank);
+  upplePts = Math.floor(totalUpples / totalFud * pointScale * uppleRank);
 }
+//- - - - - - winner rankings
+function rankSort(){
+  /* //so sad this didn't work
+  for(var i = 1; i < atmanRanks.length; i++){
+    for(var j = 0; j < atmanRanks.length; j++){
+      if (atmanRanks[i].pts > atmanRanks[j].pts){
+        atmanRanks.splice(atmanRanks[j], 0, atmanRanks[i]);
+        atmanRanks.splice(atmanRanks[i+1], 1);
+        break;
+      }
+    }
+  }
+  */
+  atmanRanks.sort(function (a, b) {
+    return b.pts - a.pts;
+  });
+}
+
+// function scoreBoard(){
+//
+//   for (var i = 0; i < atmanRanks.length; i++){
+//     var hLine =
+//     text
+//   }
+// }
