@@ -1,6 +1,7 @@
 var atmans = [];
+var mapTiles = [];
 
-function Atman(id, x, y, name, r, g, b){
+function Atman(id, x, y, name, r, g, b, tile){
   this.id = id;
   this.x = x;
   this.y = y;
@@ -11,6 +12,7 @@ function Atman(id, x, y, name, r, g, b){
   this.t;
   this.m;
   this.u;
+  this.tile = tile;
 }
  /* uncomment for heroku
 // shiffman heroku set up &&
@@ -55,7 +57,11 @@ app.get('/sharedScreen', function(req,res){
 
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
-  io.sockets.emit('heartbeat', atmans);
+  var data = {
+    atmans: atmans,
+    mapTiles: mapTiles
+  }
+  io.sockets.emit('heartbeat', data);
 }
 
 //- - - - - - - game states
@@ -77,7 +83,7 @@ io.sockets.on('connection',
 
     socket.on('start',
       function(data){
-        var atman = new Atman(socket.id, data.x, data.y, data.name, data.r, data.g, data.b);
+        var atman = new Atman(socket.id, data.x, data.y, data.name, data.r, data.g, data.b, data.tile);
         atmans.push(atman);
         console.log(atmans);
       }
@@ -87,7 +93,14 @@ io.sockets.on('connection',
       function(){
         startGame = true;
         console.log(startGame);
-      })
+      }
+    );
+
+    socket.on('startMap',
+      function(data){
+        mapTiles = data;
+      }
+    );
 
     socket.on('update',
       function(data){
@@ -105,6 +118,7 @@ io.sockets.on('connection',
               atman.t = data.t;
               atman.m = data.m;
               atman.u = data.u;
+              atman.tile = data.tile;
             }
             totalTatos += atmans[i].t;
             totalMorks += atmans[i].m;

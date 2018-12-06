@@ -40,10 +40,14 @@ var tradeTime = 1000;// for trade
 var lastTrade = 0;
 var debounce = 500;
 
+var tatoCol;
+var morkCol;
+var uppleCol;
+
 
 //- - - - - - - - map
-var slots = []; //nested array?
-
+// var slots = []; //nested array?
+var mapTiles = [];
 //- - - - - - - - game over
 var gameOver = false; //if time's up
 
@@ -78,21 +82,26 @@ function setup(){
 	submit.position(3* width/4, 5 * height / 7);
 	submit.mousePressed(playerName);
 
+	var tatoCol = color(255,253,0,50);
+	var morkCol = color(0,51,153,50);
+	var uppleCol = color(179,0,89,50);
+
 	//map slots -- 20
-	for (var y = 0; y < 5; y++){
-		slots[y] = [];
-		for (var x = 0; x < 4; x ++){
-			slots[y][x] = {
-				x: x * width/5,
-				y: y * height/6
-			}
-		}
-	}
+	// for (var y = 0; y < 5; y++){
+	// 	slots[y] = [];
+	// 	for (var x = 0; x < 4; x ++){
+	// 		slots[y][x] = {
+	// 			x: x * width/5,
+	// 			y: y * height/6
+	// 		}
+	// 	}
+	// }
 
 	// - - - - - heartbeat
 	socket.on('heartbeat',
 		function(data){
-			atmans = data;
+			atmans = data.atmans;
+			mapTiles = data.mapTiles;
 		}
 	);
 }
@@ -138,11 +147,15 @@ function draw() {
 				upple++;
 			}
 		}
+		//color not working yet, save til later
 		tatos = createButton('tatos: ' + tato);
+		tatos.style('background-color', tatoCol);
 		tatos.mousePressed(tradeTato);
 		morks = createButton('morks: ' + mork);
+		morks.style('background-color', morkCol);
 		morks.mousePressed(tradeMork);
 		upples = createButton('upples:' + upple);
+		upples.style('background-color', uppleCol);
 		upples.mousePressed(tradeUpple);
 		gameSetup = true;
 	}
@@ -196,7 +209,8 @@ function draw() {
 			y: atman.y,
 			t: tato,
 			m: mork,
-			u: upple
+			u: upple,
+			tile: atman.tile
 		};
 		socket.emit('update', data);
 
@@ -254,6 +268,10 @@ function mousePressed(){
 					if (atmans[i].id !== socket.id){
 						tradeTarget = atmans[i].name;
 						tradeId = atmans[i].id;
+						if(!oneTrade){
+							tradeButt.remove();
+						}
+						oneTrade = true;
 						// console.log(tradeId);
 					}
 		}
@@ -264,7 +282,9 @@ function mouseDragged(){
 //need to toggle so only during game, not setup?
 	for (var i = atmans.length -1; i >= 0; i--){ //could be fun if they're repelling away from items
 		if (socket.id !== atmans[i].id){
-			if (dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100){ //why isn't this working anymore?
+			if ((dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100)
+				&& (mouseX >= 50 && mouseX <= width-50)
+				&& (mouseY >= 50 && mouseY <= height-50)){ //why isn't this working anymore?
 				atman.x = mouseX;
 				atman.y = mouseY;
 				atman.show();
@@ -273,7 +293,7 @@ function mouseDragged(){
 	}
 }
 
-function Atman(id, x, y, name, r, g, b){
+function Atman(id, x, y, name, r, g, b, tile){
   this.id = id;
 	this.x = x;
   this.y = y;
@@ -281,8 +301,7 @@ function Atman(id, x, y, name, r, g, b){
 	this.r = r;
 	this.g = g;
 	this.b = b;
-	// this.col = color(r, g, b);
-	// this.select = false;
+	this.tile = tile;
 
   this.show = function(){
 		// if (this.select){
@@ -330,22 +349,40 @@ function hideDom(){ //all but start
 
 function newPlayer(){
 	atman = new Atman (socket.id, random(50, width - 50), random(50, height-50),
-	 name, redCol, greenCol, blueCol);
-	 console.log(redCol);
-	var data = {
-		id: atman.id,
-		x: atman.x,
-		y: atman.y,
-		name: atman.name,
-		r: redCol,
-		g: greenCol,
-		b: blueCol
-	};
-	socket.emit('start', data);
-	console.log(data);
+	 name, redCol, greenCol, blueCol, int(random(9)));
+	// var data = {
+	// 	id: atman.id,
+	// 	x: atman.x,
+	// 	y: atman.y,
+	// 	name: atman.name,
+	// 	r: redCol,
+	// 	g: greenCol,
+	// 	b: blueCol,
+	// 	tile: atman.tile
+	// };
+	//could have just emit atman huh....
+	socket.emit('start', atman);
+	console.log(atman);
 	joined = true;
 	startButt.hide();
 }
+
+// function Tile(x,y,w,h,r,g,b){
+//   this.x = x;
+//   this.y = y;
+//   this.w = w;
+//   this.h = h;
+//   this.r = r;
+//   this.g = g;
+//   this.b = b;
+//
+//   this.show = function(){
+//     strokeWeight(1);
+//     stroke(0);
+//     fill(this.r, this.g, this.b);
+//     rect(this.x, this.y, this.w, this.h);
+//   }
+// }
 
 function trade(){
 	tato -= tato4u;

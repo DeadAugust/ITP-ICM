@@ -1,14 +1,15 @@
 // var socket = io('/sharedScreen');
 var socket = io();
 
-var testButton;
-
+var startButton;
+var atmans = [];
 //- - - - - - - - map
 var mapTiles = [];
+// var mapNames = [];
 
 //- - - - - - - timer
 var startTime = false; //timer on/off
-var timeLimit = 15000; //test timer
+var timeLimit = 80000; //test timer
 // var timeLimit = 120000; //two mins per round
 var timer; //millis tracker
 var clock; //countdown display
@@ -34,8 +35,8 @@ function setup(){
   textAlign(CENTER);
   textSize(height/10);
   background(0,150,50);
-  testButton = createButton('start Game');
-  testButton.mousePressed(startGame);
+  startButton = createButton('start Game');
+  startButton.mousePressed(startGame);
 
   //map
 var tile0 = new Tile(0, height/4, width/3, height/4, 255, 204, 255);//light pink top left
@@ -57,12 +58,23 @@ mapTiles.push(tile7);
 var tile8 = new Tile(2* width/3, 3 * height/4, width/3, height/4, 102, 204, 255);//light blue bottom right
 mapTiles.push(tile8);
 
-  // socket.on('heartbeat',
-  //   function(data){
-  //     // socket.emit('rankCheck?');
-  //     // console.log('emit');
-  //   }
-  // );
+socket.emit('startMap', mapTiles);
+
+  socket.on('heartbeat',
+    function(data){
+      atmans = data.atmans;
+      console.log(atmans);
+      for(var i = 0; i < mapTiles.length; i++){
+        mapTiles[i].names = 0;
+      }
+      for(var j = data.atmans.length -1; j >= 0; j--){
+        var location = data.atmans[j].tile;
+        // mapTiles[location].names.push(data.atmans[j].name);
+        mapTiles[location].names++;
+
+      }
+    }
+  );
 }
 
 
@@ -70,7 +82,7 @@ function draw (){
   // background(20, 200, 100); //sandbox start where all avatars are?
   if(finalScores){
     // textSize(height/10);
-    // background(51, 204, 51);
+    background(51, 204, 51);
     // strokeWeight(4);
     // stroke(255);
     // fill(0);
@@ -89,11 +101,19 @@ function draw (){
   }
   else if(startTime){
     //map
+
     textSize(height/10);
     background(0,150,50);
     rectMode(CORNER);
     for (var i = 0; i < mapTiles.length; i++){
       mapTiles[i].show();
+      mapTiles[i].nameCount = 1;
+      for (var j = atmans.length -1; j >= 0; j--){
+        if(atmans[j].tile == mapTiles[i]){
+          fill(atmans[j].r, atmans[j].g, atmans[j].b);
+          mapTiles[i].gps(atmans[j].name);
+        }
+      }
     }
     //fud Status
     var fudBlack;
@@ -151,6 +171,11 @@ function draw (){
       // finalScores = true;
     }
 
+    //player locations
+    // for(var i = 0; i < mapTiles.length; i++){
+    //
+    // }
+
     socket.on('rankCheck',
       function(data){
         // console.log(data.tRank, data.mRank, data.uRank);
@@ -206,6 +231,19 @@ function startGame(){
   timer = millis();
 }
 
+function Atman(id, x, y, name, r, g, b){
+  this.id = id;
+  this.x = x;
+  this.y = y;
+  this.name = name;
+  this.r = r;
+  this.g = g;
+  this.b = b;
+  this.t;
+  this.m;
+  this.u;
+}
+
 function Tile(x,y,w,h,r,g,b){
   this.x = x;
   this.y = y;
@@ -214,11 +252,19 @@ function Tile(x,y,w,h,r,g,b){
   this.r = r;
   this.g = g;
   this.b = b;
+  this.names = 0;
+  this.nameCount;
 
   this.show = function(){
     strokeWeight(1);
     stroke(0);
     fill(this.r, this.g, this.b);
     rect(this.x, this.y, this.w, this.h);
+  }
+
+  this.gps = function(atmanName){
+    noStroke();
+    text(atmanName, this.x + (this.w /2), this.y + ((this.h/(this.names + 1)) * this.nameCount));
+    this.nameCount++;
   }
 }
