@@ -140,7 +140,7 @@ io.sockets.on('connection',
           mRank: morkRank,
           uRank: uppleRank
         }
-        console.log('rankCheck ' + socket.id);
+        // console.log('rankCheck ' + socket.id);
         io.to(socket.id).emit('rankCheck', data);
         // socket.broadcast.to(socket.id).emit('rankCheck', data); //broadcast bad?
       }
@@ -169,6 +169,7 @@ io.sockets.on('connection',
 
 //- - - - - - - in-game fud ranking //if even at start, no bad?
 function rank(){
+  /*
   if (((totalTatos > totalMorks) || (totalTatos > totalUpples))
     && ((totalTatos < totalMorks) || (totalTatos < totalUpples))){
       tatoRank = -1;
@@ -187,8 +188,37 @@ function rank(){
       morkRank = 1;
       uppleRank = -1;
     }
+    */
+  if (totalTatos > totalMorks && totalTatos <= totalUpples){
+    tatoRank = -1;
+    morkRank = 1;
+    uppleRank = 0;
+  }
+  else if(totalTatos > totalUpples && totalTatos <= totalMorks){
+    tatoRank = -1;
+    morkRank = 0;
+    uppleRank = 1;
+  }
+  else if(totalMorks > totalUpples && totalMorks <= totalTatos){
+    tatoRank = 0;
+    morkRank = -1;
+    uppleRank = 1;
+  }
+  else if(totalMorks > totalTatos && totalMorks <= totalUpples){
+    tatoRank = 1;
+    morkRank = -1;
+    uppleRank = 0;
+  }
+  else if(totalUpples > totalTatos && totalUpples <= totalMorks){
+    tatoRank = 1;
+    morkRank = 0;
+    uppleRank = -1;
+  }
   else{
-    console.log('rank bumb'); //meaningless test
+    tatoRank = 0;
+    morkRank = 1;
+    uppleRank = -1;
+    // console.log('rank bumb'); //meaningless test
     }
   }
 

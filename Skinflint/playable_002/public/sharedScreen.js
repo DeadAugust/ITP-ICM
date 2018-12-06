@@ -19,6 +19,9 @@ var clockSec;
 var badTatos = false;
 var badMorks = false;
 var badUpples = false;
+var goodTatos = false;
+var goodMorks = false;
+var goodUpples = false;
 
 
 //- - - - - - - - - final scores
@@ -27,21 +30,12 @@ var finalScores = false;
 function setup(){
   createCanvas(windowWidth-100,windowHeight-100);
   textAlign(CENTER);
+  textSize(height/10);
   background(0,150,50);
   testButton = createButton('start Game');
   testButton.mousePressed(startGame);
 
   //map
-  // for (var i = 0; i > 3; i++){
-  //   for (var j = 0; j > 3; j++){
-  //     mapTiles[i+j] = {
-  //       x:
-  //       y:
-  //       w:
-  //       h:
-  //     }
-  //   }
-  // }
 var tile0 = new Tile(0, height/4, width/3, height/4, 255, 204, 255);//light pink top left
 mapTiles.push(tile0);
 var tile1 = new Tile(width/3, height/4, width/3, height/4, 255, 255, 102); //light yellow top middle
@@ -73,28 +67,79 @@ mapTiles.push(tile8);
 function draw (){
   // background(20, 200, 100); //sandbox start where all avatars are?
   if(finalScores){
-    ellipse(100, 50, 50, 50);
-    text("0:00", 4 * width/5, height/5);
+    strokeWeight(4);
+    stroke(255);
+    fill(0);
+    // noStroke();
+    // rectMode(CENTER);
+    // rect(6*width/7, height/7, width/4, height/5);
+    // fill(255);
+    text("0:00", 5 * width/6, height/7);
   }
   else if(startTime){
     //map
+    textSize(height/10);
     background(0,150,50);
+    rectMode(CORNER);
     for (var i = 0; i < mapTiles.length; i++){
       mapTiles[i].show();
       // rect(mapTiles[i].x, mapTiles[i].y, mapTiles[i].w, mapTiles[i].h);
     }
+    //fud Status
+    var fudBlack;
+    var fudGold;
+    if(badTatos){
+      fudBlack = 5* width/36;
+    }
+    if(badMorks){
+      fudBlack = 13 * width/36;
+    }
+    if(badUpples){
+      fudBlack = 7 * width/12;
+    }
+    if(goodTatos){
+      fudGold = 5 * width/36;
+    }
+    if(goodMorks){
+      fudGold = 13 * width/36;
+    }
+    if(goodUpples){
+      fudGold = 7 * width/12;
+    }
+    textSize(height/12);
+    rectMode(CENTER);
+    noStroke();
+    fill(0);
+    rect(fudBlack, height/7, width/4, height/7);
+    strokeWeight(5);
+    stroke(255, 219, 77);//gold
+    noFill();
+    rect(fudGold, height/7, width/4, height/7);
+    noStroke();
+    fill(255, 153, 0)//orange tatos
+    text('TATOS', 5 * width/36, height/6);
+    fill(0, 51, 153); //dark blue mork
+    text('MORK', 13 * width/36, height/6);
+    fill(179, 0, 89); //fuschia? upple
+    text('UPPLES', 7 * width/12, height/6);
     // timer
     socket.emit('rankCheck?', socket.id);
     clock = int(((timeLimit + timer) - millis()) / 1000);
     clockMin = int(clock / 60);
     clockSec = int(clock % 60);
-    noStroke();
-    fill(0);
-    textSize(24);
+    textSize(height/10);
+    // noStroke();
+    strokeWeight(4);
+    stroke(0);
+    fill(255);
+    // rectMode(CENTER);
+    // rect(6*width/7, height/7, width/4, height/5);
+    // fill(255);
+    // textSize(50);
     if (clockSec < 10){
-      text(clockMin + ":0" + clockSec, 4 * width/5, height/5);
+      text(clockMin + ":0" + clockSec, 5 * width/6, height/7);
     }
-    else text(clockMin + ":" + clockSec, 4 * width/5, height/5);
+    else text(clockMin + ":" + clockSec, 5 * width/6, height/7);
     if(millis() - timer >= timeLimit){
       socket.emit('gameOver');
       console.log('game over');
@@ -122,6 +167,21 @@ function draw (){
           badUpples = true;
           console.log('Upple Rank: bad');
         }
+        if(data.tRank == 1){
+          goodTatos = true;
+          goodMorks = false;
+          goodUpples = false;
+        }
+        if(data.mRank == 1){
+          goodTatos = false;
+          goodMorks = true;
+          goodUpples = false;
+        }
+        if(data.uRank == 1){
+          goodTatos = false;
+          goodMorks = false;
+          goodUpples = true;
+        }
         // console.log('rankkkkkk');
       }
     );
@@ -146,8 +206,8 @@ function Tile(x,y,w,h,r,g,b){
   this.b = b;
 
   this.show = function(){
-    fill(0);
     strokeWeight(1);
+    stroke(0);
     fill(this.r, this.g, this.b);
     rect(this.x, this.y, this.w, this.h);
   }
