@@ -1,5 +1,6 @@
 var atmans = [];
 var mapTiles = [];
+var freeFud = [];
 
 function Atman(id, x, y, name, r, g, b, tile){
   this.id = id;
@@ -59,7 +60,8 @@ setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
   var data = {
     atmans: atmans,
-    mapTiles: mapTiles
+    mapTiles: mapTiles,
+    freeFud: freeFud
   }
   io.sockets.emit('heartbeat', data);
 }
@@ -145,6 +147,22 @@ io.sockets.on('connection',
         else{
           console.log(data.nameFrom + " sent " + data.nameTo + " an Upple");
         }
+      }
+    );
+
+    socket.on('spawn',
+      function(data){
+        freeFud = data;
+        console.log(freeFud);
+        socket.broadcast.emit('fudCheck', freeFud);
+      }
+    );
+
+    socket.on('eat',
+      function(data){
+        freeFud = data;
+        console.log(freeFud);
+        socket.broadcast.emit('fudCheck', freeFud);
       }
     );
 

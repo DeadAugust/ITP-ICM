@@ -2,6 +2,8 @@ var socket = io();
 
 var atman;
 var atmans = [];
+var mapTiles = [];
+var freeFud = [];
 
 // var bgColor;
 //- - - - - player setup
@@ -44,10 +46,11 @@ var tatoCol;
 var morkCol;
 var uppleCol;
 
+var triScale = 20; //fud triangle scaling
 
 //- - - - - - - - map
 // var slots = []; //nested array?
-var mapTiles = [];
+
 var upButt, downButt, leftButt, rightButt; //movement
 //- - - - - - - - game over
 var gameOver = false; //if time's up
@@ -115,6 +118,7 @@ function setup(){
 		function(data){
 			atmans = data.atmans;
 			mapTiles = data.mapTiles;
+			// freeFud = data.freeFud;
 		}
 	);
 }
@@ -209,15 +213,30 @@ function draw() {
 			}
 		}
 		atman.show();
-		textSize(18);
-		if (((atman.r + atman.g + atman.b) / 3) < 100){
-			fill(255);
+		meName();
+		// textSize(18);
+		// if (((atman.r + atman.g + atman.b) / 3) < 100){
+		// 	fill(255);
+		// }
+		// else {
+		// 	fill(0);
+		// }
+		// noStroke();
+		// text('me', atman.x, atman.y + 5);
+
+		//fud pick up and map display
+		console.log(freeFud);
+		for(var i = freeFud.length -1; i >= 0; i--){
+			if(freeFud[i].tile == atman.tile){
+				// freeFud[i].show();
+				noStroke();
+				fill(freeFud[i].r, freeFud[i].g, freeFud[i].b);
+				ellipse(30,30,30,30);
+				triangle(freeFud[i].cX, freeFud[i].cY + triScale,
+					freeFud[i].cX - triScale, freeFud[i].cY - triScale/2,
+					freeFud[i].cX + triScale, freeFud[i].cY - triScale/2);
+			}
 		}
-		else {
-			fill(0);
-		}
-		noStroke();
-		text('me', atman.x, atman.y + 5);
 
 		var data = {
 			x: atman.x,
@@ -236,6 +255,12 @@ function draw() {
 				oneTrade = false;
 			}
 		}
+
+		socket.on('fudCheck',
+			function(data){
+				freeFud = data;
+			}
+		);
 
 		socket.on('trade',
 			function(data){
@@ -274,6 +299,8 @@ function draw() {
 	}
 }
 
+//alphabetize functions? where do socket functions go?
+
 function mousePressed(){
 	// console.log(slots);
 	for (var i = atmans.length - 1; i >=0; i--){
@@ -306,6 +333,42 @@ function mouseDragged(){
 			}
 		}
 	}
+	for(var i = freeFud.length -1; i >= 0; i--){
+			atman.x = mouseX;
+			atman.y = mouseY;
+			atman.show();
+		if(freeFud[i].tile == atman.tile){
+			if((dist(mouseX, mouseY, freeFud[i].cX, freeFud[i].cY)) < 10){
+				tato += freeFud[i].t;
+				mork += freeFud[i].m;
+				upple += freeFud[i].u;
+				freeFud.splice(i, 1);
+				socket.emit('eat', freeFud);
+				buttonRefresh();
+			}
+		}
+	}
+}
+
+function Fud(tile, cX, cY, r, g, b, t, m, u){
+  this.tile = tile;
+	this.cX = cX;
+	this.cY = cy;
+  this.r = r;
+  this.g = g;
+  this.b = b;
+  this.t = t;
+  this.m = m;
+  this.u = u;
+
+  this.show = function(){
+		// noStroke();
+		// fill(this.r, this.g, this.b);
+		// ellipse(30,30,30,30);
+		// triangle(this.cX, this.cY + triScale,
+		// 	this.cX - triScale, this.cY - triScale/2,
+		// 	this.cX + triScale, this.cY - triScale/2);
+  }
 }
 
 function Atman(id, x, y, name, r, g, b, tile){
@@ -344,6 +407,17 @@ function playerName(){ //for faster debugging
 
 }
 
+function meName(){
+	textSize(18);
+	if (((atman.r + atman.g + atman.b) / 3) < 100){
+		fill(255);
+	}
+	else {
+		fill(0);
+	}
+	noStroke();
+	text('me', atman.x, atman.y + 5);
+}
 function colorPush(){
 	redCol = redSlide.value();
 	greenCol = greenSlide.value();
@@ -363,7 +437,7 @@ function hideDom(){ //all but start
 }
 
 function newPlayer(){
-	atman = new Atman (socket.id, random(50, width - 50), random(50, height-50),
+	atman = new Atman (socket.id, random(60, width - 60), random(60, height-60),
 	 name, redCol, greenCol, blueCol, int(random(9)));
 	// var data = {
 	// 	id: atman.id,

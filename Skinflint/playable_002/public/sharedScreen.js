@@ -6,6 +6,7 @@ var atmans = [];
 //- - - - - - - - map
 var mapTiles = [];
 // var mapNames = [];
+var freeFud = [];
 
 //- - - - - - - timer
 var startTime = false; //timer on/off
@@ -15,6 +16,9 @@ var timer; //millis tracker
 var clock; //countdown display
 var clockMin;
 var clockSec;
+var spawnTimer = 0;//resets after each spawn
+var nextSpawn = 1;//how long until next spawn
+var spawnFreq = 20;//game-wide scaling for spawn timing
 
 // - - - - - fud ranking
 var badTatos = false;
@@ -63,8 +67,9 @@ socket.emit('startMap', mapTiles);
   socket.on('heartbeat',
     function(data){
       atmans = data.atmans;
+      // freeFud = data.freeFud;
       // console.log(atmans);
-      console.log(mapTiles);
+      // console.log(mapTiles);
       for(var i = 0; i < mapTiles.length; i++){
         mapTiles[i].names = 0;
       }
@@ -172,11 +177,20 @@ function draw (){
       console.log('game over');
       // finalScores = true;
     }
+    //spawning
+    var milli = millis();
+    console.log(milli, spawnTimer, nextSpawn);
 
-    //player locations
-    // for(var i = 0; i < mapTiles.length; i++){
-    //
-    // }
+    if((spawnTimer + nextSpawn) <= milli){
+      spawnFud();
+      console.log(freeFud);
+    }
+
+    socket.on('fudCheck',
+      function(data){
+        freeFud = data;
+      }
+    );
 
     socket.on('rankCheck',
       function(data){
@@ -233,6 +247,29 @@ function startGame(){
   timer = millis();
 }
 
+function spawnFud(){
+  var spawn = int(random(3));
+  var spawnTile = int(random(9));
+  if (spawn == 0){//too hard to scale to client window, just using 300,400
+    var newTato = new Fud(spawnTile, random(60, 300), random(60, 400),
+     255, 253, 0, 1, 0, 0);
+     freeFud.push(newTato);
+  }
+  else if (spawn == 1){
+    var newMork = new Fud(spawnTile, random(60, 300), random(60, 400),
+     0, 51, 153, 0, 1, 0);
+     freeFud.push(newMork);
+  }
+  else{
+    var newUpple = new Fud(spawnTile, random(60, 300), random(60, 400),
+     179, 0, 89, 0, 0, 1);
+     freeFud.push(newUpple);
+  }
+  spawnTimer = millis();
+  nextSpawn = int(random(spawnFreq)) * 1000;
+  socket.emit('spawn', freeFud);
+}
+
 function Atman(id, x, y, name, r, g, b){
   this.id = id;
   this.x = x;
@@ -269,4 +306,20 @@ function Tile(x,y,w,h,r,g,b){
     text(atmanName, this.x + (this.w /2), this.y + ((this.h/(this.names + 1)) * this.nameCount));
     this.nameCount++;
   }
+}
+
+function Fud(tile, cX, cY, r, g, b, t, m, u){
+  this.tile = tile;
+  this.cX = cX;
+  this.cY = cY;
+  this.r = r;
+  this.g = g;
+  this.b = b;
+  this.t = t;
+  this.m = m;
+  this.u = u;
+
+  // this.show = function(){
+  //
+  // }
 }
