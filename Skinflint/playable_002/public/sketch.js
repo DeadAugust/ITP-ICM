@@ -82,6 +82,18 @@ function setup(){
 	submit.parent('myCanvas');
 	submit.position(3* width/4, 5 * height / 7);
 	submit.mousePressed(playerName);
+	upButt = createButton('up');
+	upButt.parent('myCanvas');
+	upButt.hide(); //create so not undefined in function later
+	downButt = createButton('down');
+	downButt.parent('myCanvas');
+	downButt.hide();
+	leftButt = createButton('left');
+	leftButt.parent('myCanvas');
+	leftButt.hide();
+	rightButt = createButton('right');
+	rightButt.parent('myCanvas');
+	rightButt.hide();
 
 	var tatoCol = color(255,253,0,50);
 	var morkCol = color(0,51,153,50);
@@ -159,6 +171,7 @@ function draw() {
 		upples.style('background-color', uppleCol);
 		upples.mousePressed(tradeUpple);
 		gameSetup = true;
+		moveButtons();
 	}
 	else if(gameOver){
 		background(100, 0, 40);
@@ -368,6 +381,59 @@ function newPlayer(){
 	startButt.hide();
 }
 
+
+function moveButtons(){
+	upButt.remove();
+	downButt.remove();
+	leftButt.remove();
+	rightButt.remove();
+	var tile = atman.tile;
+	//up
+	if(tile - 3 >= 0){
+		upButt = createButton('up');
+		upButt.parent('myCanvas');
+		upButt.position(width/2, height/20);
+		upButt.mousePressed(moveUp);
+	}
+	//down
+	if(tile + 3 <= 8){
+		downButt = createButton('down');
+		downButt.parent('myCanvas');
+		downButt.position(width/2, height - height/20);
+		downButt.mousePressed(moveDown);
+	}
+	//left
+	if((tile - 1 >= 0)&&(tile != 3)&&(tile != 6)){
+		leftButt = createButton('left');
+		leftButt.parent('myCanvas');
+		leftButt.position(width/20, height/2);
+		leftButt.mousePressed(moveLeft);
+	}
+	//right
+	if((tile + 1 <= 8)&&(tile != 2)&&(tile != 5)){
+		rightButt = createButton('right');
+		rightButt.parent('myCanvas');
+		rightButt.position(width - width/20, height/2);
+		rightButt.mousePressed(moveRight);
+	}
+}
+
+function moveUp(){
+	atman.tile -= 3;
+	moveButtons();
+}
+function moveDown(){
+	atman.tile += 3;
+	moveButtons();
+}
+function moveLeft(){
+	atman.tile -= 1;
+	moveButtons();
+}
+function moveRight(){
+	atman.tile += 1;
+	moveButtons();
+}
 // function Tile(x,y,w,h,r,g,b){
 //   this.x = x;
 //   this.y = y;
