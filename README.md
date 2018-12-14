@@ -25,3 +25,4 @@ NYT_ObitAPI
 
 Skinflint
   project folders for ICM Final Project -- a live RPG for mobile
+  Tradetatos is the culmination, but the main files for that are in a separate repo on my account, "Playable_002"
